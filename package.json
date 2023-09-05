@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsnd --respawn --clear src/app.ts",
-    "build": "rimraf ./dist && tsc",
-    "start": "node dist/app.js"
+    "build": "rimraf ./dist && tsc && npm run prisma:migrate:prod",
+    "start": "node dist/app.js",
+    "prisma:migrate:prod": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -14,11 +15,13 @@
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/node": "^20.5.8",
+    "prisma": "^5.2.0",
     "rimraf": "^5.0.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@prisma/client": "^5.2.0",
     "dotenv": "^16.3.1",
     "env-var": "^7.4.1",
     "express": "^4.18.2"
