@@ -10,7 +10,7 @@
     "prisma:migrate:prod": "prisma migrate deploy",
     "prisma:migrate:test": "dotenv -e .env.test -- npx prisma migrate deploy",
     "test": "npm run prisma:migrate:test && jest",
-    "test:watch": "npm run prisma:migrate:test && jest --watch",
+    "test:watch": "npm run prisma:migrate:test && jest --watchAll --coverage",
     "test:coverage": "npm run prisma:migrate:test && jest --coverage"
   },
   "keywords": [],

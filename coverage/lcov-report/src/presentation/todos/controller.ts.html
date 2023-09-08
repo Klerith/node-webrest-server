@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">94.93% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>70/70</span>
+                <span class='fraction'>75/79</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.11% </span>
+                <span class="strong">89.47% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>16/17</span>
+                <span class='fraction'>17/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">94.93% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>70/70</span>
+                <span class='fraction'>75/79</span>
             </div>
         
             
@@ -132,8 +132,16 @@
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
 <a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -144,6 +152,16 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -202,9 +220,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">import { Request, Response } from 'express';
-import { prisma } from '../../data/postgres';
 import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos';
-import { CreateTodo, DeleteTodo, GetTodo, GetTodos, TodoRepository, UpdateTodo } from '../../domain';
+import { CreateTodo, CustomError, DeleteTodo, GetTodo, GetTodos, TodoRepository, UpdateTodo } from '../../domain';
 &nbsp;
 &nbsp;
 export class TodosController {
@@ -214,13 +231,23 @@ export class TodosController {
     private readonly todoRepository: TodoRepository,
   ) { }
 &nbsp;
+  private handleError = ( res: Response, error: unknown ) =&gt; {
+    if ( error instanceof CustomError ) {
+      res.status(error.statusCode).json({ error: error.message });
+      return;
+    }
+<span class="cstat-no" title="statement not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >    </span></span>
+<span class="cstat-no" title="statement not covered" >    // grabar log</span>
+<span class="cstat-no" title="statement not covered" >    res.status(500).json({ error: 'Internal server error - check logs' });</span>
+<span class="cstat-no" title="statement not covered" >  }</span>
+&nbsp;
 &nbsp;
   public getTodos = ( req: Request, res: Response ) =&gt; {
 &nbsp;
     new GetTodos( this.todoRepository )
       .execute()
       .then( todos =&gt; res.json( todos ) )
-      .catch( error =&gt; res.status( 400 ).json( { error } ) );
+      .catch( error =&gt; this.handleError(res, error) );
 &nbsp;
   };
 &nbsp;
@@ -230,7 +257,7 @@ export class TodosController {
     new GetTodo( this.todoRepository )
       .execute( id )
       .then( todo =&gt; res.json( todo ) )
-      .catch( error =&gt; res.status( 400 ).json( { error } ) );
+      .catch( error =&gt; this.handleError(res, error) );
 &nbsp;
   };
 &nbsp;
@@ -241,7 +268,7 @@ export class TodosController {
     new CreateTodo( this.todoRepository )
       .execute( createTodoDto! )
       .then( todo =&gt; res.status(201).json( todo ) )
-      .catch( error =&gt; res.status( 400 ).json( { error } ) );
+      .catch( error =&gt; this.handleError(res, error) );
 &nbsp;
   };
 &nbsp;
@@ -253,7 +280,7 @@ export class TodosController {
     new UpdateTodo( this.todoRepository )
       .execute( updateTodoDto! )
       .then( todo =&gt; res.json( todo ) )
-      .catch( error =&gt; res.status( 400 ).json( { error } ) );
+      .catch( error =&gt; this.handleError(res, error) );
 &nbsp;
   };
 &nbsp;
@@ -264,7 +291,7 @@ export class TodosController {
     new DeleteTodo( this.todoRepository )
       .execute( id )
       .then( todo =&gt; res.json( todo ) )
-      .catch( error =&gt; res.status( 400 ).json( { error } ) );
+      .catch( error =&gt; this.handleError(res, error) );
 &nbsp;
   };
 &nbsp;
@@ -277,7 +304,7 @@ export class TodosController {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-09-07T19:39:54.843Z
+                at 2023-09-08T14:13:42.702Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
